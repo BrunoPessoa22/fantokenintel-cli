@@ -18,14 +18,17 @@ builds:
       - amd64
       - arm64
     ldflags:
-      - -s -w -X main.version={{.Version}}
+      - -s -w -X github.com/BrunoPessoa22/fantokenintel-cli/cmd.Version={{.Version}}
 
 archives:
   - id: default
     name_template: "fti_{{ .Os }}_{{ .Arch }}"
+    formats:
+      - tar.gz
     format_overrides:
       - goos: windows
-        format: zip
+        formats:
+          - zip
 
 checksum:
   name_template: "fti_checksums.txt"
@@ -38,13 +41,17 @@ changelog:
       - "^test:"
       - "^chore:"
 
-brews:
-  - name: fantokenintel
-    homepage: "https://fantokenintel.vercel.app"
-    description: "CLI for Fan Token Intel — market data, signals & whale tracking"
-    repository:
-      owner: BrunoPessoa22
-      name: homebrew-fantokenintel
-    install: bin.install "fti"
-    test: |
-      system "#{bin}/fti", "--version"
+# Homebrew tap — requires HOMEBREW_TAP_TOKEN secret with repo scope on homebrew-fantokenintel.
+# Uncomment when that secret is configured.
+#
+# homebrew_casks:
+#   - name: fantokenintel
+#     homepage: "https://fantokenintel.vercel.app"
+#     description: "CLI for Fan Token Intel — market data, signals & whale tracking"
+#     repository:
+#       owner: BrunoPessoa22
+#       name: homebrew-fantokenintel
+#       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+#     install: bin.install "fti"
+#     test: |
+#       system "#{bin}/fti", "--version"
