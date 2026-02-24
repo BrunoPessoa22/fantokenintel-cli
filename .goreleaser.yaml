@@ -41,7 +41,7 @@ changelog:
       - "^test:"
       - "^chore:"
 
-homebrew_casks:
+brews:
   - name: fantokenintel
     homepage: "https://fantokenintel.vercel.app"
     description: "CLI for Fan Token Intel — market data, signals & whale tracking"
