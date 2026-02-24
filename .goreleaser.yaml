@@ -1,0 +1,50 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: fti
+    main: .
+    binary: fti
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+
+archives:
+  - id: default
+    name_template: "fti_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: "fti_checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+brews:
+  - name: fantokenintel
+    homepage: "https://fantokenintel.vercel.app"
+    description: "CLI for Fan Token Intel — market data, signals & whale tracking"
+    repository:
+      owner: BrunoPessoa22
+      name: homebrew-fantokenintel
+    install: bin.install "fti"
+    test: |
+      system "#{bin}/fti", "--version"
