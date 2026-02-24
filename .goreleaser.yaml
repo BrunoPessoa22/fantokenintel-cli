@@ -41,17 +41,14 @@ changelog:
       - "^test:"
       - "^chore:"
 
-# Homebrew tap — requires HOMEBREW_TAP_TOKEN secret with repo scope on homebrew-fantokenintel.
-# Uncomment when that secret is configured.
-#
-# homebrew_casks:
-#   - name: fantokenintel
-#     homepage: "https://fantokenintel.vercel.app"
-#     description: "CLI for Fan Token Intel — market data, signals & whale tracking"
-#     repository:
-#       owner: BrunoPessoa22
-#       name: homebrew-fantokenintel
-#       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
-#     install: bin.install "fti"
-#     test: |
-#       system "#{bin}/fti", "--version"
+homebrew_casks:
+  - name: fantokenintel
+    homepage: "https://fantokenintel.vercel.app"
+    description: "CLI for Fan Token Intel — market data, signals & whale tracking"
+    repository:
+      owner: BrunoPessoa22
+      name: homebrew-fantokenintel
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    install: bin.install "fti"
+    test: |
+      system "#{bin}/fti", "--version"
