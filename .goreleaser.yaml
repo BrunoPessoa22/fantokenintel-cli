@@ -41,15 +41,4 @@ changelog:
       - "^test:"
       - "^chore:"
 
-brews:
-  - name: fantokenintel
-    homepage: "https://fantokenintel.vercel.app"
-    description: "CLI for Fan Token Intel — market data, signals & whale tracking"
-    repository:
-      owner: BrunoPessoa22
-      name: homebrew-fantokenintel
-      branch: main
-      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
-    install: bin.install "fti"
-    test: |
-      system "#{bin}/fti", "--version"
+# Homebrew formula is pushed by the release workflow after GoReleaser completes.
