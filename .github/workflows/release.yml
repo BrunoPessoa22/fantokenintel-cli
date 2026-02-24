@@ -37,9 +37,8 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           VERSION="${TAG#v}"
-
-          # Download release archives to compute checksums
           BASE="https://github.com/BrunoPessoa22/fantokenintel-cli/releases/download/${TAG}"
+
           curl -sLO "${BASE}/fti_darwin_arm64.tar.gz"
           curl -sLO "${BASE}/fti_darwin_amd64.tar.gz"
           curl -sLO "${BASE}/fti_linux_arm64.tar.gz"
@@ -47,12 +46,16 @@ jobs:
 
           SHA_DARWIN_ARM64=$(sha256sum fti_darwin_arm64.tar.gz | awk '{print $1}')
           SHA_DARWIN_AMD64=$(sha256sum fti_darwin_amd64.tar.gz | awk '{print $1}')
-          SHA_LINUX_ARM64=$(sha256sum fti_linux_arm64.tar.gz  | awk '{print $1}')
-          SHA_LINUX_AMD64=$(sha256sum fti_linux_amd64.tar.gz  | awk '{print $1}')
+          SHA_LINUX_ARM64=$(sha256sum fti_linux_arm64.tar.gz   | awk '{print $1}')
+          SHA_LINUX_AMD64=$(sha256sum fti_linux_amd64.tar.gz   | awk '{print $1}')
 
-          FORMULA=$(cat <<EOF
+          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/BrunoPessoa22/homebrew-fantokenintel.git" /tmp/tap
+          cd /tmp/tap
+          mkdir -p Formula
+
+          cat > Formula/fantokenintel.rb <<FORMULA
           class Fantokenintel < Formula
-            desc "CLI for Fan Token Intel — market data, signals & whale tracking"
+            desc "CLI for Fan Token Intel -- market data, signals & whale tracking"
             homepage "https://fantokenintel.vercel.app"
             version "${VERSION}"
             license "MIT"
@@ -82,40 +85,14 @@ jobs:
             end
 
             test do
-              system "#{bin}/fti", "--version"
+              system "\#{bin}/fti", "--version"
             end
           end
-          EOF
-          )
+          FORMULA
 
-          # Get current SHA of formula file (needed for update; empty on first create)
-          SHA=$(curl -s \
-            -H "Authorization: Bearer ${HOMEBREW_TAP_TOKEN}" \
-            "https://api.github.com/repos/BrunoPessoa22/homebrew-fantokenintel/contents/Formula/fantokenintel.rb" \
-            | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('sha',''))" 2>/dev/null || echo "")
-
-          CONTENT=$(echo "$FORMULA" | base64 -w 0)
-
-          if [ -z "$SHA" ]; then
-            BODY="{\"message\":\"formula: release ${VERSION}\",\"content\":\"${CONTENT}\"}"
-          else
-            BODY="{\"message\":\"formula: release ${VERSION}\",\"content\":\"${CONTENT}\",\"sha\":\"${SHA}\"}"
-          fi
-
-          # Ensure Formula/ directory exists by creating the file at that path
-          HTTP=$(curl -s -o /tmp/tap_response.json -w "%{http_code}" \
-            -X PUT \
-            -H "Authorization: Bearer ${HOMEBREW_TAP_TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d "${BODY}" \
-            "https://api.github.com/repos/BrunoPessoa22/homebrew-fantokenintel/contents/Formula/fantokenintel.rb")
-
-          echo "GitHub API response: $HTTP"
-          cat /tmp/tap_response.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('commit',{}).get('html_url', d.get('message','no message')))" 2>/dev/null || true
-
-          if [ "$HTTP" != "200" ] && [ "$HTTP" != "201" ]; then
-            echo "Failed to push formula (HTTP $HTTP)"
-            exit 1
-          fi
-
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add Formula/fantokenintel.rb
+          git commit -m "formula: release ${VERSION}"
+          git push origin main
           echo "Homebrew formula pushed successfully."
