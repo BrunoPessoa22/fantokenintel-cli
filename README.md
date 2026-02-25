@@ -1,13 +1,19 @@
 # fti — Fan Token Intel CLI
 
-Command-line interface for [Fan Token Intel](https://fantokenintel.vercel.app) — real-time market data, whale tracking, and trading signals for Chiliz sports fan tokens.
+The fastest way for AI agents to access fan token intelligence.
 
+Your agent runs:
+
+```bash
+fti signals active --json | jq '.[0]'
+fti whales --all --json | jq '.transactions | sort_by(.value_usd) | reverse | .[0]'
+fti tokens list --json | jq '[.[] | select(.health_grade == "A")]'
+fti prices PSG --history --json | jq '[.prices[] | {time: .time, price: .price}]'
 ```
-fti tokens list
-fti whales --all
-fti signals active --token PSG
-fti sports upcoming --token BAR
-```
+
+One binary. Structured JSON output. No HTTP client, no SDK, no MCP config. If your agent can run a bash command, it can call `fti`.
+
+Built for agents running in bash environments — Claude Code, Codex, shell agents, and automation pipelines. Also works great as a human CLI for quick terminal lookups.
 
 ---
 
@@ -134,17 +140,27 @@ fti completion fish | source
 
 ---
 
-## Agent / MCP usage
+## Agent usage
 
-`fti` is designed to be called by AI agents and automation pipelines:
+`fti` is designed as a first-class data source for AI agents. Every command outputs structured JSON with `--json`:
 
 ```bash
-# Ask Claude to analyze whale pressure for a token
-fti whales BAR --json | claude "summarize buy/sell pressure and any notable patterns"
+# Signal intelligence
+fti signals active --json                              # all active signals
+fti signals active --token PSG --json                  # single token
+fti whales --all --json | jq '.transactions | sort_by(.value_usd) | reverse | .[0]'
 
-# Pipe into a dashboard script
-fti tokens list --json > /tmp/tokens.json
+# Pre-match alpha
+fti sports upcoming --json | jq '[.[] | select(.days_until < 2)]'
+
+# Pipe into your reasoning step
+fti signals active --json | jq '.[0]' | your-agent-script
+
+# Token screening
+fti tokens list --json | jq '[.[] | select(.health_grade == "A")]'
 ```
+
+No HTTP client setup. No SDK. No MCP config required — if your agent has bash access, it has fan token data.
 
 ---
 
