@@ -86,7 +86,7 @@ func priceHistory(c *internal.Client, symbol string) error {
 		} `json:"prices"`
 	}
 
-	raw, err := c.Get("/api/tokens/"+symbol+"/history", q, &resp)
+	raw, err := c.Get("/api/history/price/"+symbol, q, &resp)
 	if err != nil {
 		return err
 	}
