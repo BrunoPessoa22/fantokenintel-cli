@@ -23,16 +23,18 @@ var rootCmd = &cobra.Command{
 	Version: Version,
 	Long: `fti — command-line interface for Fan Token Intel
 
-Market data, whale tracking, and trading signals for sports fan tokens.
-Powered by the Fan Token Intel API (https://fantokenintel.vercel.app).
-
-Get an API key:
-  fti auth register
+The descriptive fan-token intelligence layer for agents: prices, whale-distribution
+flows, on-chain data and match-impact across fan tokens. Data, not advice.
+Powered by the Fan Token Intel API (https://fantokenintel.com).
 
 Quick start:
   fti tokens list
-  fti signals active --token PSG
-  fti whales --all`,
+  fti whales --all
+  fti sports upcoming
+
+Premium — the event-impact moat (match-event → market-adjusted price reactions)
+is metered per call on the x402 gateway: https://x402.brunopessoa.com
+Free higher limits with a key:  fti auth register`,
 	SilenceUsage: true,
 }
 
